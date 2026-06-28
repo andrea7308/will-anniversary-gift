@@ -85,10 +85,25 @@ window.SPRITES = {
    * ─────────────────────────────────────────────────────────────────
    */
   tileset: {
-    src: 'assets/maps/westside.png',  // ← your tileset PNG
+    src: 'assets/maps/westside.png',
     tileW: 20,
     tileH: 20,
-    useFallback: false                   // draws colored rectangles if PNG missing
+    useFallback: false, 
+
+    // Named aliases so game.js can reference tiles by name instead of magic numbers
+    ids: {
+      river:          0,
+      river_shimmer:  1,
+      pier:           2,
+      path:           3,
+      sidewalk:       4,
+      road_edge:      5,
+      grass:          6,
+      road:           7,
+      building:       8,
+      sidewalk_line:  9,
+      sidewalk_plain: 10
+    }
   },
 
   /**
