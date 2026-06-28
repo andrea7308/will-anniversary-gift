@@ -112,8 +112,8 @@ window.SPRITES = {
    */
   heart: {
     src: 'assets/sprites/heart.png',
-    frameW: 20,
-    frameH: 20,
+    frameW: 32,
+    frameH: 32,
     frameCount: 2,  // frame 0 = uncollected, frame 1 = collected
     animSpeed: 500,
     useFallback: false
