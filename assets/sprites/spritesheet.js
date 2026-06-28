@@ -101,6 +101,6 @@ window.SPRITES = {
     frameH: 20,
     frameCount: 2,  // frame 0 = uncollected, frame 1 = collected
     animSpeed: 500,
-    useFallback: true
+    useFallback: false
   }
 };
