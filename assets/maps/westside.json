@@ -11,17 +11,13 @@
   "tileset": {
     "comment": "Each tile ID maps to a rect [x, y, w, h] in your tileset PNG. Edit these to match your spritesheet.",
     "tiles": {
-      "0":  { "id": 0, "name": "river",        "src": [0,   0,  20, 20], "walkable": false },
-      "1":  { "id": 1, "name": "pier",         "src": [20,  0,  20, 20], "walkable": true  },
-      "2":  { "id": 2, "name": "path",         "src": [40,  0,  20, 20], "walkable": true  },
-      "3":  { "id": 3, "name": "road",         "src": [60,  0,  20, 20], "walkable": false },
-      "4":  { "id": 4, "name": "grass",        "src": [80,  0,  20, 20], "walkable": true  },
-      "5":  { "id": 5, "name": "grass_dark",   "src": [100, 0,  20, 20], "walkable": true  },
-      "6":  { "id": 6, "name": "sidewalk",     "src": [120, 0,  20, 20], "walkable": true  },
-      "7":  { "id": 7, "name": "building",     "src": [140, 0,  20, 20], "walkable": false },
-      "8":  { "id": 8, "name": "tree_top",     "src": [160, 0,  20, 20], "walkable": false },
-      "9":  { "id": 9, "name": "tree_trunk",   "src": [180, 0,  20, 20], "walkable": false },
-      "10": { "id": 10,"name": "water_shimmer","src": [200, 0,  20, 20], "walkable": false }
+      "0":  { "id": 0, "name": "river",        "src": [0,   0,  20, 49], "walkable": false },
+      "1":  { "id": 1, "name": "pier",         "src": [20,  0,  20, 50], "walkable": true  },
+      "2":  { "id": 2, "name": "path",         "src": [40,  0,  20, 79], "walkable": true  },
+      "3":  { "id": 3, "name": "road",         "src": [60,  0,  20, 93], "walkable": true },
+      "4":  { "id": 4, "name": "grass",        "src": [80,  0,  20, 106], "walkable": true  },
+      "5":  { "id": 5, "name": "grass_dark",   "src": [100, 0,  20, 138], "walkable": true  },
+      "6":  { "id": 6, "name": "sidewalk",     "src": [120, 0,  20, 174], "walkable": true  }
     }
   },
 
