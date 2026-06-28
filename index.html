@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Send It 💗</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0f0c29;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'Courier New', monospace;
+      overflow: hidden;
+    }
+
+    #game-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    #game-canvas {
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      border: 2px solid #ff6b9d;
+      box-shadow: 0 0 30px rgba(255, 107, 157, 0.3);
+    }
+
+    /* ── HUD ── */
+    #hud {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      pointer-events: none;
+    }
+
+    #hearts-hud {
+      display: flex;
+      gap: 6px;
+      font-size: 20px;
+    }
+
+    #steps-hud {
+      font-size: 11px;
+      color: rgba(255,255,255,0.6);
+      letter-spacing: 1px;
+    }
+
+    /* ── Start screen ── */
+    #start-screen {
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 8, 30, 0.97);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      color: #fff;
+    }
+
+    #start-screen h1 {
+      font-size: 26px;
+      color: #ff6b9d;
+      text-align: center;
+      line-height: 1.4;
+      letter-spacing: 2px;
+    }
+
+    #start-screen .subtitle {
+      font-size: 13px;
+      color: #aaa;
+      text-align: center;
+      line-height: 1.8;
+    }
+
+    #start-screen .from {
+      font-size: 14px;
+      color: #ff9ab5;
+      letter-spacing: 1px;
+    }
+
+    #start-btn {
+      margin-top: 8px;
+      background: #ff6b9d;
+      color: #fff;
+      border: none;
+      padding: 12px 32px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      letter-spacing: 2px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    #start-btn:hover { background: #e0558a; }
+
+    /* ── Message box ── */
+    #message-box {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10, 8, 30, 0.95);
+      border-top: 2px solid #ff6b9d;
+      color: #fff;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      padding: 14px 20px;
+      text-align: center;
+      line-height: 1.8;
+      display: none;
+      cursor: pointer;
+    }
+
+    #message-box strong {
+      color: #ff6b9d;
+      display: block;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    #message-box .hint {
+      display: block;
+      margin-top: 8px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 1px;
+    }
+
+    /* ── Mobile controls ── */
+    #mobile-controls {
+      display: none;
+      gap: 8px;
+      padding: 10px;
+      justify-content: center;
+    }
+
+    #mobile-controls button {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.25);
+      width: 52px;
+      height: 52px;
+      font-size: 20px;
+      cursor: pointer;
+      border-radius: 6px;
+      font-family: monospace;
+      transition: background 0.1s;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    #mobile-controls button:active { background: rgba(255,107,157,0.35); }
+
+    /* show mobile controls on touch devices */
+    @media (pointer: coarse) {
+      #mobile-controls { display: flex; }
+    }
+
+    #controls-hint {
+      position: absolute;
+      bottom: 8px;
+      right: 10px;
+      font-size: 10px;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 1px;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+<div id="game-wrapper">
+  <canvas id="game-canvas"></canvas>
+
+  <div id="hud">
+    <div id="hearts-hud">
+      <span id="h1">🤍</span>
+      <span id="h2">🤍</span>
+      <span id="h3">🤍</span>
+    </div>
+    <div id="steps-hud">steps: 0</div>
+  </div>
+
+  <div id="controls-hint">arrow keys / wasd</div>
+
+  <div id="message-box" id="message-box"></div>
+
+  <div id="start-screen">
+    <h1>💌 SEND IT 💌</h1>
+    <p class="from">from Andrea, with love</p>
+    <p class="subtitle">
+      Navigate the West Side Highway<br>
+      collect 3 💗 along the way<br>
+      then find your surprise at the top
+    </p>
+    <p class="subtitle" style="font-size:11px; color:#666;">
+      each heart = a marathon milestone 🏃 🧗
+    </p>
+    <button id="start-btn">▶ &nbsp; START</button>
+  </div>
+</div>
+
+<div id="mobile-controls">
+  <button id="btn-left"  onpointerdown="mobileDown('left')"  onpointerup="mobileUp('left')">◀</button>
+  <button id="btn-up"    onpointerdown="mobileDown('up')"    onpointerup="mobileUp('up')">▲</button>
+  <button id="btn-down"  onpointerdown="mobileDown('down')"  onpointerup="mobileUp('down')">▼</button>
+  <button id="btn-right" onpointerdown="mobileDown('right')" onpointerup="mobileUp('right')">▶</button>
+</div>
+
+<!-- load game modules in order -->
+<script src="assets/sprites/spritesheet.js"></script>
+<script src="game.js"></script>
+
+</body>
+</html>
