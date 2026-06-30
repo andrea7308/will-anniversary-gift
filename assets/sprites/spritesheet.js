@@ -45,9 +45,9 @@ window.SPRITES = {
 
   andrea: {
     src: 'assets/sprites/andrea.png', // ← replace with your PNG filename
-    frameW: 20,
-    frameH: 26,
-    frameCount: 4,
+    frameW: 32,
+    frameH: 32,
+    frameCount: 2,
     animSpeed: 150,
     rows: {
       down:  0,
@@ -55,7 +55,7 @@ window.SPRITES = {
       right: 2,
       up:    3
     },
-    useFallback: true
+    useFallback: false
   },
 
   /**
