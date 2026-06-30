@@ -206,6 +206,7 @@ function checkHearts() {
 
 function checkWin() {
   if (heartsCollected < 3) return;
+  if (gameState === 'message') return; // don't steal focus while a heart message is up
   const npc = MAP_DATA.objects.npc;
   if (player.col === npc.col && player.row === npc.row && gameState !== 'won') {
     gameState = 'won';
@@ -263,19 +264,19 @@ function draw() {
 
 // ── Map ───────────────────────────────────────────────────────────
 
-// Fallback tile colors when tileset PNG is missing
+// Fallback tile colors — used only when westside.png hasn't loaded yet
 const FALLBACK_COLORS = {
-  0:  '#3a7bd5',  // river
-  1:  '#8B6914',  // pier
-  2:  '#d4c5a0',  // path
-  3:  '#555555',  // road
-  4:  '#5a9e4a',  // grass
-  5:  '#4a8e3a',  // grass dark
-  6:  '#c8bca0',  // sidewalk
-  7:  '#8a9bb5',  // building
-  8:  '#2d7a2d',  // tree top
-  9:  '#8B4513',  // tree trunk
-  10: '#5a9be8',  // water shimmer
+  0:  '#4449ff',  // river
+  1:  '#5358ff',  // river_shimmer
+  2:  '#6e6a50',  // pier
+  3:  '#a38359',  // path
+  4:  '#969490',  // sidewalk
+  5:  '#4b6b2a',  // road_edge
+  6:  '#127819',  // grass
+  7:  '#4b4b43',  // road
+  8:  '#4b4b43',  // building
+  9:  '#969490',  // sidewalk_line
+  10: '#969490',  // sidewalk_plain
 };
 
 function drawMap() {
@@ -283,6 +284,7 @@ function drawMap() {
   const groundLayer = MAP_DATA.layers.ground;
   const tileset = window.SPRITES.tileset;
   const img = images.tileset;
+  const usePNG = img && !tileset.useFallback;
 
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
@@ -290,48 +292,25 @@ function drawMap() {
       const x = c * tileSize;
       const y = r * tileSize;
 
-      if (img && !tileset.useFallback) {
-        // Draw from PNG tileset
+      if (usePNG) {
+        // Draw tile directly from your PNG strip — each tile is tileW pixels apart
         const sx = tileId * tileset.tileW;
         ctx.drawImage(img, sx, 0, tileset.tileW, tileset.tileH, x, y, tileSize, tileSize);
       } else {
-        // Fallback: colored rectangle
-        ctx.fillStyle = FALLBACK_COLORS[tileId] || '#333';
+        // Fallback: solid color rectangle while PNG loads
+        ctx.fillStyle = FALLBACK_COLORS[tileId] ?? '#333';
         ctx.fillRect(x, y, tileSize, tileSize);
-
-        // Extra details on fallback tiles
-        if (tileId === 4 && (r + c) % 2 === 1) {
-          ctx.fillStyle = '#4a8e3a';
-          ctx.fillRect(x, y, tileSize, tileSize);
-        }
-        if (tileId === 0 && (r + c) % 3 === 0) {
-          ctx.fillStyle = '#5a9be8';
-          ctx.fillRect(x, y, tileSize, tileSize);
-        }
-        if (tileId === 3) {
-          // Road center line
-          if (c % 5 === 2) {
-            ctx.fillStyle = 'rgba(255,255,255,0.5)';
-            ctx.fillRect(x + 8, y + 9, 4, 2);
-          }
-        }
-        if (tileId === 7) {
-          // Building windows
-          ctx.fillStyle = 'rgba(255,240,150,0.5)';
-          ctx.fillRect(x + 3, y + 4, 5, 5);
-          ctx.fillRect(x + 12, y + 4, 5, 5);
-        }
       }
     }
   }
 
-  // Draw landmark labels
+  // Landmark labels on top of tiles
   if (MAP_DATA.objects.landmarks) {
     MAP_DATA.objects.landmarks.forEach(lm => {
       const x = lm.col * MAP_DATA.meta.tileSize;
       const y = lm.row * MAP_DATA.meta.tileSize;
-      ctx.fillStyle = 'rgba(0,0,0,0.55)';
-      ctx.fillRect(x - 2, y - 12, 90, 14);
+      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      ctx.fillRect(x - 2, y - 13, 92, 14);
       ctx.fillStyle = '#ffe';
       ctx.font = '9px monospace';
       ctx.fillText(lm.label, x, y - 2);

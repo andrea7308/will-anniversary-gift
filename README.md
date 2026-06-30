@@ -24,6 +24,8 @@ will-game/
 
 ---
 
+## 🎨 How to Make Your Sprites
+
 ### Characters (will.png / andrea.png)
 
 Use **[Piskel](https://www.piskelapp.com/)** — free, browser-based, no install needed.
@@ -119,7 +121,7 @@ Row 0 is the top of the map. Edit to match your tileset.
    - Go to your repo → **Settings** → **Pages** (left sidebar)
    - Under "Source", select **Deploy from a branch**
    - Branch: `main`, Folder: `/ (root)`
-   - Click **Save*
+   - Click **Save**
 
 5. **Your game is live!** 🎉
    - URL will be: `https://YOUR-USERNAME.github.io/will-game/`

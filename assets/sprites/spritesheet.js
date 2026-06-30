@@ -29,25 +29,25 @@ window.SPRITES = {
 
   will: {
     src: 'assets/sprites/will.png',   // ← replace with your PNG filename
-    frameW: 32,                         // width of one frame in the sheet
-    frameH: 32,                         // height of one frame
-    frameCount:12,                      // frames per animation row
+    frameW: 20,                         // width of one frame in the sheet
+    frameH: 26,                         // height of one frame
+    frameCount: 4,                      // frames per animation row
     animSpeed: 150,                     // ms per frame
     rows: {
       down:  0,
-      up:  1,
-      left: 2,
-      right:    3
+      left:  1,
+      right: 2,
+      up:    3
     },
     // fallback: drawn in code if PNG fails to load (see game.js drawFallbackWill)
-    useFallback: false
+    useFallback: true
   },
 
   andrea: {
     src: 'assets/sprites/andrea.png', // ← replace with your PNG filename
-    frameW: 32,
-    frameH: 32,
-    frameCount: 2,
+    frameW: 20,
+    frameH: 26,
+    frameCount: 4,
     animSpeed: 150,
     rows: {
       down:  0,
@@ -55,40 +55,34 @@ window.SPRITES = {
       right: 2,
       up:    3
     },
-    useFallback: false
+    useFallback: true
   },
 
   /**
-   * TILESET
+   * TILESET — westside.png (220×20, 11 tiles × 20px each)
    * ─────────────────────────────────────────────────────────────────
-   * Your map tileset is a single horizontal strip PNG.
-   * Each tile is tileW × tileH. Tiles are ordered left to right
-   * matching the tile IDs in westside.json.
+   * Tile index → what's in YOUR PNG (left → right):
    *
-   * Tile order in your PNG (left → right):
-   *   0: river
-   *   1: pier
-   *   2: path
-   *   3: road
-   *   4: grass
-   *   5: grass_dark
-   *   6: sidewalk
-   *   7: building
-   *   8: tree_top
-   *   9: tree_trunk
-   *  10: water_shimmer
+   *   0  river          — blue ripple water
+   *   1  river_shimmer  — blue ripple (lighter variant)
+   *   2  pier           — water left half + sandy planks right half
+   *   3  path           — full sandy brown (walkway / bike path)
+   *   4  sidewalk       — light gray with dark right edge
+   *   5  road_edge      — dark left strip + grass checkerboard (transition)
+   *   6  grass          — green with small red flower dot
+   *   7  road           — solid dark gray
+   *   8  building       — dark gray body + light gray right strip (window column)
+   *   9  sidewalk_line  — light gray with dark center lane markings
+   *  10  sidewalk_plain — solid light gray
    *
-   * HOW TO MAKE THE TILESET:
-   *   1. Open Piskel, set canvas to 220×20 (11 tiles × 20px each)
-   *   2. Draw each tile in its slot
-   *   3. Export as PNG → save as assets/maps/westside.png
+   * The tile IDs used in westside.json ground layer must match these indices.
    * ─────────────────────────────────────────────────────────────────
    */
   tileset: {
     src: 'assets/maps/westside.png',
     tileW: 20,
     tileH: 20,
-    useFallback: false, 
+    useFallback: false,  // ✅ PNG loaded — set back to true if you swap the file
 
     // Named aliases so game.js can reference tiles by name instead of magic numbers
     ids: {
@@ -112,10 +106,10 @@ window.SPRITES = {
    */
   heart: {
     src: 'assets/sprites/heart.png',
-    frameW: 32,
-    frameH: 32,
+    frameW: 20,
+    frameH: 20,
     frameCount: 2,  // frame 0 = uncollected, frame 1 = collected
     animSpeed: 500,
-    useFallback: false
+    useFallback: true
   }
 };
