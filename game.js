@@ -62,33 +62,102 @@ document.getElementById('start-btn').addEventListener('click', () => {
   gameState = 'playing';
 });
 
-// ── Load everything, then start loop ─────────────────────────────
-Promise.all([loadMap(), loadImages()]).then(() => {
-  initGame();
-  requestAnimationFrame(loop);
-}).catch(err => {
-  console.error('Failed to load assets:', err);
-  // Still start with fallbacks
+// ── Boot: load images then kick off game ─────────────────────────
+loadImages().then(() => {
   initGame();
   requestAnimationFrame(loop);
 });
 
-// ─────────────────────────────────────────────────────────────────
-// LOADING
-// ─────────────────────────────────────────────────────────────────
+// ── Map data embedded directly — no fetch needed ─────────────────
+// Tile IDs: 0=water, 1=pier, 2=sidewalk, 3=path, 4=grass, 5=road, 6=building
+// W=water, P=pier, S=sidewalk, T=path(trail), G=grass, R=road, B=building
+MAP_DATA = {
+  meta: { name: "West Side Highway", tileSize: 20, cols: 34, rows: 21 },
+  layers: {
+    ground: [
+      // rows 0-6: river/water
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,1,1,1,0,0,0],
+      [0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,1,1,1,0,0,0],
+      [0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,1,1,1,0,0,0],
+      // row 7: pier
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      // rows 8-9: path (bike lane — main walkable area)
+      [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3],
+      // row 10: road
+      [5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],
+      // rows 11-13: grass
+      [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4],
+      [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4],
+      [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4],
+      // rows 14-15: sidewalk
+      [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
+      [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
+      // rows 16-20: buildings
+      [6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6],
+      [6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6],
+      [6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6],
+      [6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6],
+      [6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6]
+    ],
+    collision: { data: [
+      // 0=walkable, 1=blocked
+      // rows 0-6: water — blocked
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1,1,1],
+      [1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1,1,1],
+      [1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1,1,1],
+      [1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1,1,1],
+      // row 7: pier — walkable
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      // rows 8-9: path — walkable
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      // row 10: road — walkable (player can cross)
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      // rows 11-13: grass — walkable (trees can be added as blocked spots)
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      // rows 14-15: sidewalk — walkable
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      // rows 16-20: buildings — blocked
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+    ]}
+  },
+  objects: {
+    playerStart: { col: 2, row: 9 },
+    npc: { col: 31, row: 14, sprite: "andrea" },
+    hearts: [
+      { id: 1, col: 8,  row: 9,  title: "💗 Heart 1",  message: "Every day you make me smile. 🌟", collected: false },
+      { id: 2, col: 18, row: 12, title: "💗 Heart 2",  message: "You are my best friend. 🤗", collected: false },
+      { id: 3, col: 28, row: 14, title: "💗 Heart 3",    message: "You did it. Marathon ready.\nNow find Andrea and unlock your surprise 💌", collected: false }
+    ]
+  },
+  winMessage: {
+    title: "💌 You made it, Will!",
+    message: "Happy 1 Year Anniversary 🎉\n\nThis past year with you has been my favorite adventure \nHere's to every next chapter together.\n\nI love you so much.\n— Andrea 💗"
+  }
+};
 
-function loadMap() {
-  return fetch('assets/maps/westside.json')
-    .then(r => r.json())
-    .then(data => { MAP_DATA = data; });
-}
-
+// ── Load images then start ────────────────────────────────────────
 function loadImages() {
   const toLoad = Object.entries(window.SPRITES).map(([key, def]) => {
     return new Promise(resolve => {
       const img = new Image();
       img.onload  = () => { images[key] = img; resolve(); };
-      img.onerror = () => { images[key] = null; resolve(); }; // fallback
+      img.onerror = () => { images[key] = null; resolve(); };
       img.src = def.src;
     });
   });
@@ -264,20 +333,16 @@ function draw() {
 
 // ── Map ───────────────────────────────────────────────────────────
 
-// Fallback tile colors — used only when westside.png hasn't loaded yet
-const FALLBACK_COLORS = {
-  0:  '#4449ff',  // river
-  1:  '#5358ff',  // river_shimmer
-  2:  '#6e6a50',  // pier
-  3:  '#a38359',  // path
-  4:  '#969490',  // sidewalk
-  5:  '#4b6b2a',  // road_edge
-  6:  '#127819',  // grass
-  7:  '#4b4b43',  // road
-  8:  '#4b4b43',  // building
-  9:  '#969490',  // sidewalk_line
-  10: '#969490',  // sidewalk_plain
-};
+// Fallback colors per tile ID (0–6) when PNG hasn't loaded
+const FALLBACK_COLORS = [
+  '#4449ff',  // 0 water
+  '#a38359',  // 1 pier
+  '#969490',  // 2 sidewalk
+  '#c8c8c8',  // 3 path
+  '#127819',  // 4 grass
+  '#4b4b43',  // 5 road
+  '#8a9bb5',  // 6 building
+];
 
 function drawMap() {
   const { cols, rows, tileSize } = MAP_DATA.meta;
@@ -293,11 +358,12 @@ function drawMap() {
       const y = r * tileSize;
 
       if (usePNG) {
-        // Draw tile directly from your PNG strip — each tile is tileW pixels apart
-        const sx = tileId * tileset.tileW;
-        ctx.drawImage(img, sx, 0, tileset.tileW, tileset.tileH, x, y, tileSize, tileSize);
+        // Each tile has its own source rect [sx, sw] in the PNG strip
+        const tile = tileset.tiles[tileId];
+        if (tile) {
+          ctx.drawImage(img, tile.sx, 0, tile.sw, tileset.tileH, x, y, tileSize, tileSize);
+        }
       } else {
-        // Fallback: solid color rectangle while PNG loads
         ctx.fillStyle = FALLBACK_COLORS[tileId] ?? '#333';
         ctx.fillRect(x, y, tileSize, tileSize);
       }
@@ -368,8 +434,9 @@ function drawNPC() {
 
   if (img && !def.useFallback) {
     const row = def.rows['down'];
+    const frame = gameState === 'won' ? 1 : 0;  // frame 2 on win
     ctx.drawImage(img,
-      0, row * def.frameH, def.frameW, def.frameH,
+      frame * def.frameW, row * def.frameH, def.frameW, def.frameH,
       x, y, def.frameW, def.frameH
     );
   } else {
