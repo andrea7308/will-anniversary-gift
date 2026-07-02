@@ -142,7 +142,7 @@ MAP_DATA = {
     hearts: [
       { id: 1, col: 8,  row: 9,  title: "💗 Heart 1",  message: "Every day you make me smile. 🌟", collected: false },
       { id: 2, col: 18, row: 12, title: "💗 Heart 2",  message: "You are my best friend. 🤗", collected: false },
-      { id: 3, col: 28, row: 14, title: "💗 Heart 3",    message: "You did it. Marathon ready.\nNow find Andrea and unlock your surprise 💌", collected: false }
+      { id: 3, col: 28, row: 14, title: "💗 Heart 3",    message: "You did it. \nNow find Andrea and unlock your surprise 💌", collected: false }
     ]
   },
   winMessage: {
