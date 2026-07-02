@@ -40,7 +40,7 @@ window.SPRITES = {
       up:    3
     },
     // fallback: drawn in code if PNG fails to load (see game.js drawFallbackWill)
-    useFallback: false
+    useFallback: true
   },
 
   andrea: {
@@ -55,7 +55,7 @@ window.SPRITES = {
       right: 2,
       up:    3
     },
-    useFallback: false
+    useFallback: true
   },
 
   /**
@@ -110,6 +110,6 @@ window.SPRITES = {
     frameH: 20,
     frameCount: 2,  // frame 0 = uncollected, frame 1 = collected
     animSpeed: 500,
-    useFallback: false
+    useFallback: true
   }
 };
